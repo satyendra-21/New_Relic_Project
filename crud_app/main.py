@@ -3,7 +3,7 @@ import uuid
 from fastapi import FastAPI, HTTPException
 from crud_app.models.tickets import TicketCreate, TicketUpdate
 from crud_app.utils.logger import logger
-
+from crud_app.config import settings
 app = FastAPI()
 
 tickets = []
