@@ -43,10 +43,23 @@ def fetch_logs(
         """
     }
     
-    response = requests.post(
-        url,
-        headers=headers,
-        json=graphql_query
-    )
+    from log_fetcher.utils.exceptions import AuthenticationException, UpstreamAPIException
 
-    return response.json()
+    try:
+        response = requests.post(
+            url,
+            headers=headers,
+            json=graphql_query,
+            timeout=30
+        )
+        
+        if response.status_code in (401, 403):
+            raise AuthenticationException("Invalid or unauthorized New Relic API Key")
+        
+        response.raise_for_status()
+        return response.json()
+        
+    except requests.exceptions.Timeout:
+        raise UpstreamAPIException("New Relic API request timed out")
+    except requests.exceptions.RequestException as e:
+        raise UpstreamAPIException(f"Failed to communicate with New Relic API: {str(e)}")

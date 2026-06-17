@@ -1,0 +1,3 @@
+to restart the server : uvicorn crud_app.main:app --reload --reload-dir crud_app
+change to venv : source venv/bin/activate
+
