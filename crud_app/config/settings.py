@@ -23,5 +23,16 @@ DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_NAME = os.getenv("DB_NAME", "newrelic_tickets")
 
 from urllib.parse import quote_plus
-encoded_password = quote_plus(DB_PASSWORD) if DB_PASSWORD else ""
-DATABASE_URL = f"mysql+pymysql://{DB_USER}:{encoded_password}@{DB_HOST}/{DB_NAME}"
+
+# If DATABASE_URL is provided (e.g., by Render), use it!
+env_db_url = os.getenv("DATABASE_URL")
+
+if env_db_url:
+    # SQLAlchemy 1.4+ requires 'postgresql://' instead of 'postgres://'
+    if env_db_url.startswith("postgres://"):
+        env_db_url = env_db_url.replace("postgres://", "postgresql://", 1)
+    DATABASE_URL = env_db_url
+else:
+    # Fallback to local MySQL setup
+    encoded_password = quote_plus(DB_PASSWORD) if DB_PASSWORD else ""
+    DATABASE_URL = f"mysql+pymysql://{DB_USER}:{encoded_password}@{DB_HOST}/{DB_NAME}"
