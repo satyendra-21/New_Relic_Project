@@ -1,14 +1,18 @@
 import os
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 
 from crud_app.main import app as crud_app
 from log_fetcher.main import app as log_fetcher_app
 
-app = FastAPI(title="New Relic Unified Backend")
+app = FastAPI(title="New Relic Unified Backend", docs_url=None, redoc_url=None)
 
 app.mount("/crud", crud_app)
 app.mount("/logs", log_fetcher_app)
+
+@app.get("/docs", include_in_schema=False)
+def redirect_docs():
+    return RedirectResponse(url="/crud/docs")
 
 @app.get("/", response_class=HTMLResponse)
 def root():
